@@ -12,24 +12,24 @@ import {NgForm} from '@angular/forms';
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit {
-user = {} as User;
+    user = {} as User;
 
-  constructor(public fireauth: AngularFireAuth, public navCtrl: Router, ) { }
+    constructor(public fireauth: AngularFireAuth, public navCtrl: Router) { }
 
-  ngOnInit() {
-  }
+    ngOnInit() {
+    }
 
-async signin(user: User) {
-  try {
-   const result =  this.fireauth.auth.signInWithEmailAndPassword(user.email, user.password);
-   if (result) {
-       console.log(result);
-       this.navCtrl.navigateByUrl('home');
-   }
-  } catch (e) {
-      console.log(e);
-  }
-}
+    async signin(user: User) {
+      try {
+       const result =  this.fireauth.auth.signInWithEmailAndPassword(user.email, user.password);
+       if (result) {
+           console.log(result);
+           this.navCtrl.navigateByUrl('home');
+       }
+      } catch (e) {
+          console.log(e);
+      }
+    }
 
     async register(user: User) {
         try {
