@@ -15,9 +15,7 @@
       </agm-direction>
     </agm-map>
   </div>
-  <ion-list class="padding" *ngIf="directions != undefined">
-    <ion-item *ngFor="let direction of directions">
-      <ion-label>{{direction.html_instructions}} for approximately {{direction.distance.text}}</ion-label>
-    </ion-item>
-  </ion-list>
+    <div>
+        <ion-button (click)="getRide()" expand="full"> ${{rideCost}} | {{totalDistance?.text}} | Order Ride</ion-button>
+    </div>
 </ion-content>

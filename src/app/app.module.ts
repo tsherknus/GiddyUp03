@@ -19,6 +19,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {AgmDirectionModule} from "agm-direction";
 import {NativeGeocoder} from "@ionic-native/native-geocoder/ngx";
 import {Geolocation} from "@ionic-native/geolocation/ngx";
+import {HTTP} from "@ionic-native/http/ngx";
 
 @NgModule({
   declarations: [AppComponent],
@@ -44,6 +45,7 @@ import {Geolocation} from "@ionic-native/geolocation/ngx";
     StatusBar,
     SplashScreen,
     Geolocation,
+    HTTP,
     NativeGeocoder,
     HttpClient,
     GoogleMapsAPIWrapper,

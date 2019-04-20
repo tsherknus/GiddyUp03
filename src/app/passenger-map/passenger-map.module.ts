@@ -6,7 +6,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 
 import { PassengerMapPage } from './passenger-map.page';
-import {AgmCoreModule} from "@agm/core";
+import {AgmCoreModule, GoogleMapsAPIWrapper, MapsAPILoader} from "@agm/core";
 import {AgmDirectionModule} from "agm-direction";
 import {HttpClientModule} from "@angular/common/http";
 
@@ -24,7 +24,7 @@ const routes: Routes = [
     FormsModule,
     IonicModule,
     AgmCoreModule.forRoot({
-      apiKey: 'AIzaSyDFTKbcSXEN22pUx3zfaabEOGyy7oOZtmI',
+      apiKey: 'AIzaSyBKUXy8iVIl2-FvFT2tt6x_jVHzrE189LY',
       libraries: ["places", "geometry"]
     }),
     AgmDirectionModule,

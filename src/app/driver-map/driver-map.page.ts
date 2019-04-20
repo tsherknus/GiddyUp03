@@ -16,12 +16,12 @@ import {HttpClient} from '@angular/common/http';
 })
 export class DriverMapPage implements OnInit {
 
-  @ViewChild('map') elementView: ElementRef;
+  @ViewChild('map1') elementView1: ElementRef;
 
-  @ViewChild("search")
-  public searchElementRef: ElementRef;
+  @ViewChild("search1")
+  public searchElementRef1: ElementRef;
 
-  public searchControl: FormControl;
+  public searchControl1: FormControl;
   public latitude: number;
   public longitude: number;
   public zoom: number;
@@ -48,11 +48,11 @@ export class DriverMapPage implements OnInit {
 
   ngOnInit() {
     //create search FormControl
-    this.searchControl = new FormControl();
+    this.searchControl1 = new FormControl();
 
     //load Places Autocomplete
     this.mapsAPILoader.load().then(() => {
-      this.autocomplete = new google.maps.places.Autocomplete(this.searchElementRef.nativeElement, {
+      this.autocomplete = new google.maps.places.Autocomplete(this.searchElementRef1.nativeElement, {
         types: []
       });
       this.autocomplete.addListener("place_changed", () => {
@@ -82,7 +82,7 @@ export class DriverMapPage implements OnInit {
         if (--i) {
           theLoop(i);
         }
-      }, 1000);
+      }, 500);
     };
 
     theLoop(9000);
@@ -96,9 +96,7 @@ export class DriverMapPage implements OnInit {
 
     this.geolocation.getCurrentPosition(options).then((resp) => {
       this.lat = resp.coords.latitude;
-      console.log(resp.coords.latitude);
       this.lng = resp.coords.longitude;
-      console.log(resp.coords.longitude);
       this.zoom = 16;
     }).catch((error) => {
       console.log('Error getting location', error);
@@ -125,8 +123,6 @@ export class DriverMapPage implements OnInit {
     this.markersOff = false;
     this.origin = { lat: this.lat, lng: this.lng };
     this.destination = { lat: this.latitude, lng: this.longitude };
-
-    console.log(this.distance(this.origin.lat, this.origin.lng, this.destination.lat, this.destination.lng));
 
     this.getDirections(this.lat, this.lng, this.latitude, this.longitude).subscribe(
         directions => { this.directions = directions;

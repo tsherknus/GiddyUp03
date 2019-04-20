@@ -6,10 +6,10 @@
   <div class="map-full-card-content">
     <ion-item>
       <ion-input *ngIf="false">
-        <input placeholder="Enter Destination" autocorrect="off" autocapitalize="off" spellcheck="off" type="text" class="form-control" #search [formControl]="searchControl">
+        <input placeholder="Enter Destination" autocorrect="off" autocapitalize="off" spellcheck="off" type="text" class="form-control" #search1 [formControl]="searchControl1">
       </ion-input>
     </ion-item>
-    <agm-map [streetViewControl]="false" [zoomControl]="false" [latitude]="lat" [longitude]="lng" [zoom]="14">
+    <agm-map #map1 [streetViewControl]="false" [zoomControl]="false" [latitude]="lat" [longitude]="lng" [zoom]="14">
       <agm-marker [latitude]="lat" [longitude]="lng"></agm-marker>
       <agm-direction [origin]="origin" [destination]="destination">
       </agm-direction>
