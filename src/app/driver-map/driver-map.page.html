@@ -9,8 +9,9 @@
       <div *ngIf="!rideConfirmed">
         <agm-marker *ngFor="let pass of locPair" [latitude]="pass.lat" [longitude]="pass.lng" (markerClick)="inquireRide(pass.lat, pass.lng, pass.dlat, pass.dlng)"></agm-marker>
       </div>
-
-      <agm-direction [origin]="origin" [waypointsMarker]="passengerLoc" [destination]="destination">
+      <agm-direction [origin]="origin" [destination]="passengerLoc">
+      </agm-direction>
+      <agm-direction [origin]="passengerLoc" [destination]="destination">
       </agm-direction>
     </agm-map>
   </div>
