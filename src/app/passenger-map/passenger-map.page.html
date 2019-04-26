@@ -9,13 +9,15 @@
         <input placeholder="Enter Destination" autocorrect="off" autocapitalize="off" spellcheck="off" type="text" class="form-control" #search [formControl]="searchControl">
       </ion-input>
     </ion-item>
-    <agm-map [streetViewControl]="false" [zoomControl]="false" [latitude]="lat" [longitude]="lng" [zoom]="14">
+    <agm-map [streetViewControl]="false" [zoomControl]="false" [latitude]="lat" [longitude]="lng" [zoom]="zoom">
       <agm-marker [latitude]="lat" [longitude]="lng"></agm-marker>
-      <agm-direction [origin]="origin" [destination]="destination">
+      <agm-marker [latitude]="latitude" [longitude]="longitude"></agm-marker>
+      <agm-direction [origin]="origin" [destination]="destination" [renderOptions]="renderOptions" >
       </agm-direction>
     </agm-map>
   </div>
     <div>
-        <ion-button (click)="getRide()" expand="full"> ${{rideCost}} | {{totalDistance?.text}} | Order Ride</ion-button>
+        <ion-button *ngIf="driverConnected == false" (click)="getRide()" expand="full"> ${{rideCost}} | {{totalDistance}} | Order Ride</ion-button>
+        <ion-button *ngIf="driverConnected == true" disabled="true" expand="full"> Driver is on their way.</ion-button>
     </div>
 </ion-content>

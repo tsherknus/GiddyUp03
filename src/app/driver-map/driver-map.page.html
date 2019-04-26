@@ -4,20 +4,17 @@
 </ion-header>
 <ion-content>
   <div class="map-full-card-content">
-    <ion-item>
-      <ion-input *ngIf="false">
-        <input placeholder="Enter Destination" autocorrect="off" autocapitalize="off" spellcheck="off" type="text" class="form-control" #search1 [formControl]="searchControl1">
-      </ion-input>
-    </ion-item>
     <agm-map #map1 [streetViewControl]="false" [zoomControl]="false" [latitude]="lat" [longitude]="lng" [zoom]="14">
-      <agm-marker [latitude]="lat" [longitude]="lng"></agm-marker>
-      <agm-direction [origin]="origin" [destination]="destination">
+      <agm-marker [latitude]="lat" [longitude]="lng" (markerClick)="goBack()"></agm-marker>
+      <div *ngIf="!rideConfirmed">
+        <agm-marker *ngFor="let pass of locPair" [latitude]="pass.lat" [longitude]="pass.lng" (markerClick)="inquireRide(pass.lat, pass.lng, pass.dlat, pass.dlng)"></agm-marker>
+      </div>
+
+      <agm-direction [origin]="origin" [waypointsMarker]="passengerLoc" [destination]="destination">
       </agm-direction>
     </agm-map>
   </div>
-  <ion-list class="padding" *ngIf="directions != undefined">
-    <ion-item *ngFor="let direction of directions">
-      <ion-label>{{direction.html_instructions}} for approximately {{direction.distance.text}}</ion-label>
-    </ion-item>
-  </ion-list>
+  <div>
+    <ion-button (click)="confirmRide()" expand="full">Confirm Ride</ion-button>
+  </div>
 </ion-content>

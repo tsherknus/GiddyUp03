@@ -7,6 +7,7 @@ import {FormControl} from '@angular/forms';
 import { MapsAPILoader } from '@agm/core';
 import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
+import {HTTP} from "@ionic-native/http/ngx";
 
 
 @Component({
@@ -27,7 +28,12 @@ export class DriverMapPage implements OnInit {
   public zoom: number;
   public autocomplete: any;
 
+  passengerLoc: any;
+
   public markersOff: boolean = true;
+
+  plat: number;
+  plng: number;
 
   public origin: any;
   public destination: any;
@@ -39,43 +45,56 @@ export class DriverMapPage implements OnInit {
   totalDistance: any;
   rideDuration: any;
 
+  rideConfirmed: boolean = false;
+
+  passengers: any;
+
+  passenger1: Passenger = new class implements Passenger {
+    dlat: number;
+    dlng: number;
+    lat: number;
+    lng: number;
+  };
+
+  locPair: any[] = [];
+
   constructor(
       private geolocation: Geolocation,
       private mapsAPILoader: MapsAPILoader,
       private ngZone: NgZone,
-      private http: HttpClient) {
+      private http: HTTP) {
   }
 
   ngOnInit() {
-    //create search FormControl
-    this.searchControl1 = new FormControl();
 
-    //load Places Autocomplete
-    this.mapsAPILoader.load().then(() => {
-      this.autocomplete = new google.maps.places.Autocomplete(this.searchElementRef1.nativeElement, {
-        types: []
-      });
-      this.autocomplete.addListener("place_changed", () => {
-        this.ngZone.run(() => {
-          //get the place result
-          let place: google.maps.places.PlaceResult = this.autocomplete.getPlace();
+    let theLoop: (i: number) => void = (i: number) => {
+      setTimeout(() => {
+        this.getLocation();
+        if (--i) {
+          theLoop(i);
+        }
+      }, 500);
+    };
 
-          //verify result
-          if (place.geometry === undefined || place.geometry === null) {
-            return;
-          }
+    theLoop(5);
 
-          //set latitude, longitude and zoom
-          this.latitude = place.geometry.location.lat();
-          this.longitude = place.geometry.location.lng();
-          this.zoom = 14;
+    this.getPassengers();
 
-          this.getDirection();
-        });
-      });
-      this.getLocation();
-    });
+  }
 
+  inquireRide(rlat: number, rlng: number, dlat: number, dlng: number) {
+    this.origin = { lat: this.lat, lng: this.lng };
+    this.destination = { lat: dlat, lng: dlng };
+    this.passengerLoc = { lat: rlat, lng: rlng};
+    this.rideConfirmed = true;
+  }
+
+  goBack() {
+    this.destination = undefined;
+  }
+
+  confirmRide() {
+    this.rideConfirmed = true;
     let theLoop: (i: number) => void = (i: number) => {
       setTimeout(() => {
         this.getLocation();
@@ -103,10 +122,6 @@ export class DriverMapPage implements OnInit {
     });
   }
 
-  getDirections(oLat: any, oLng: any, dLat: any, dLng: any):Observable<any> {
-    return this.http.get("https://maps.googleapis.com/maps/api/directions/json?origin=" + oLat + "," + oLng + "&destination=" + dLat + "," + dLng + "&key=AIzaSyBpb9FeAHl54o7wl9N6emBbgbdUaPX_yzk");
-  }
-
   // "https://maps.googleapis.com/maps/api/directions/json?origin=" + this.lat + "," + this.lng + "&destination=" + this.latitude + "," + this.latitude + "key=AIzaSyBHmC7WbuSh95dO3BzYMuA5ULvea1AgQB8"
 
   distance(lat1, lon1, lat2, lon2) {
@@ -119,17 +134,27 @@ export class DriverMapPage implements OnInit {
     return 7917 * Math.asin(Math.sqrt(a)); // 2 * R; R = 3958.7 km
   }
 
-  getDirection() {
-    this.markersOff = false;
-    this.origin = { lat: this.lat, lng: this.lng };
-    this.destination = { lat: this.latitude, lng: this.longitude };
+  //https://giddyup-23736.firebaseio.com/rest/passenger/location/ploc.json?print=pretty
 
-    this.getDirections(this.lat, this.lng, this.latitude, this.longitude).subscribe(
-        directions => { this.directions = directions;
-          this.totalDistance = directions.routes[0].legs[0].distance;
-          this.rideDuration = directions.routes[0].legs[0].duration;
-          this.directions = directions.routes[0].legs[0].steps
-        }
-    );
+  getPassengers():Promise<any> {
+    // return this.http.get("https://maps.googleapis.com/maps/api/directions/json?origin=" + oLat + "," + oLng + "&destination=" + dLat + "," + dLng + "&key=AIzaSyBpb9FeAHl54o7wl9N6emBbgbdUaPX_yzk");
+    return this.http.get("https://giddyup-23736.firebaseio.com/rest/shit/backend1/ploc.json?print=pretty", {}, {})
+        .then(data => {
+          this.passengers = JSON.parse(data.data);
+          for (let pass of this.passengers.passenger) {
+            this.passenger1 = pass;
+            this.locPair.push(this.passenger1);
+          }
+
+          // this.directionsTest = JSON.stringify(this.directions);
+          // this.totalDistance = JSON.stringify(this.directions.routes[0].legs[0].distance.text).replace('"', '').replace('"', '');
+          // this.rideCost = JSON.stringify((2 * (+this.totalDistance.replace(' mi', '').replace(',', ''))));
+          // this.rideDuration = this.directions.routes[0].legs[0].duration;
+          // this.directions = this.directions.routes[0].legs[0].steps
+        }).catch(error => {
+          console.log(error.status);
+          console.log(error.error); // error message as string
+          console.log(error.headers);
+        });
   }
 }

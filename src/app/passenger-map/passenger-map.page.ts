@@ -26,7 +26,7 @@ export class PassengerMapPage implements OnInit {
   public searchControl: FormControl;
   public latitude: number;
   public longitude: number;
-  public zoom: number;
+  public zoom: number = 14;
   public autocomplete: any;
 
   public markersOff: boolean = true;
@@ -37,10 +37,20 @@ export class PassengerMapPage implements OnInit {
   lat: number;
   lng: number;
 
+  lat1: number;
+  lng1: number;
+
   directions: any;
   totalDistance: any;
   rideCost: any = '';
   rideDuration: any;
+  directionsTest: any;
+
+  driverConnected: boolean = false;
+
+  public renderOptions = {
+    suppressMarkers: true,
+  }
 
   constructor(
       private geolocation: Geolocation,
@@ -53,7 +63,6 @@ export class PassengerMapPage implements OnInit {
   ngOnInit() {
     //create search FormControl
     this.agmMap.triggerResize();
-
     this.searchControl = new FormControl();
 
     //load Places Autocomplete
@@ -65,33 +74,18 @@ export class PassengerMapPage implements OnInit {
         this.ngZone.run(() => {
           //get the place result
           let place: google.maps.places.PlaceResult = this.autocomplete.getPlace();
-
           //verify result
           if (place.geometry === undefined || place.geometry === null) {
             return;
           }
-
           //set latitude, longitude and zoom
           this.latitude = place.geometry.location.lat();
           this.longitude = place.geometry.location.lng();
-          this.zoom = 14;
-
           this.getDirection();
         });
       });
       this.getLocation();
     });
-
-    let theLoop: (i: number) => void = (i: number) => {
-      setTimeout(() => {
-        this.getLocation();
-        if (--i) {
-          theLoop(i);
-        }
-      }, 500);
-    };
-
-    theLoop(9000);
   }
 
   async presentLoading() {
@@ -115,7 +109,6 @@ export class PassengerMapPage implements OnInit {
     this.geolocation.getCurrentPosition(options).then((resp) => {
       this.lat = resp.coords.latitude;
       this.lng = resp.coords.longitude;
-      this.zoom = 16;
     }).catch((error) => {
       console.log('Error getting location', error);
     });
@@ -127,24 +120,19 @@ export class PassengerMapPage implements OnInit {
 
   getDirections(oLat: any, oLng: any, dLat: any, dLng: any):Promise<any> {
     // return this.http.get("https://maps.googleapis.com/maps/api/directions/json?origin=" + oLat + "," + oLng + "&destination=" + dLat + "," + dLng + "&key=AIzaSyBpb9FeAHl54o7wl9N6emBbgbdUaPX_yzk");
-    return this.http.get('https://maps.googleapis.com/maps/api/directions/json?origin=' + oLat + ',' + oLng + '&destination=' + dLat + ',' + dLng + '&key=AIzaSyBpb9FeAHl54o7wl9N6emBbgbdUaPX_yzk', {}, {})
-        .then(directions => {
-          this.directions = directions.data;
-          alert(JSON.parse(this.directions.routes[0].legs[0].distance));
-          this.totalDistance = this.directions.data.routes[0].legs[0].distance;
-
-          this.rideCost = (2 * (+this.totalDistance.text.replace(' mi', '').replace(',', '')));
-          this.rideDuration = this.directions.data.routes[0].legs[0].duration;
-          this.directions = this.directions.data.routes[0].legs[0].steps
-        })
-        .catch(error => {
-
+    return this.http.get("https://maps.googleapis.com/maps/api/directions/json?origin=" + oLat + "," + oLng +
+        "&destination=" + dLat + "," + dLng + "&key=AIzaSyBpb9FeAHl54o7wl9N6emBbgbdUaPX_yzk", {}, {})
+        .then(data => {
+          this.directions = JSON.parse(data.data);
+          this.directionsTest = JSON.stringify(this.directions);
+          this.totalDistance = JSON.stringify(this.directions.routes[0].legs[0].distance.text).replace('"', '').replace('"', '');
+          this.rideCost = JSON.stringify((2 * (+this.totalDistance.replace(' mi', '').replace(',', ''))));
+          this.rideDuration = this.directions.routes[0].legs[0].duration;
+          this.directions = this.directions.routes[0].legs[0].steps
+        }).catch(error => {
           console.log(error.status);
           console.log(error.error); // error message as string
-          alert(error.error);
-          alert(error.status);
           console.log(error.headers);
-
         });
   }
 
@@ -162,24 +150,20 @@ export class PassengerMapPage implements OnInit {
     this.markersOff = false;
     this.origin = { lat: this.lat, lng: this.lng };
     this.destination = { lat: this.latitude, lng: this.longitude };
-
-    console.log(this.distance(this.origin.lat, this.origin.lng, this.destination.lat, this.destination.lng));
-
     this.getDirections(this.lat, this.lng, this.latitude, this.longitude);
-    //     .subscribe(
-    //     directions => { this.directions = directions;
-    //       this.totalDistance = directions.routes[0].legs[0].distance;
-    //       console.log(+this.totalDistance.text.replace(' mi', '').replace(',', ''))
-    //
-    //       this.rideCost = (2 * (+this.totalDistance.text.replace(' mi', '').replace(',', '')));
-    //       this.rideDuration = directions.routes[0].legs[0].duration;
-    //       this.directions = directions.routes[0].legs[0].steps
-    //     }
-    // );
   }
 
   getRide() {
     this.presentLoading();
-    console.log(this.origin, this.destination);
+    this.driverConnected = true;
+    let theLoop: (i: number) => void = (i: number) => {
+      setTimeout(() => {
+        this.getLocation();
+        if (--i) {
+          theLoop(i);
+        }
+      }, 500);
+    };
+    theLoop(90000);
   }
 }
